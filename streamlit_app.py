@@ -18,6 +18,8 @@ def add_entrant(entrant):
 
 def choose_winner():
     # Randomly picks a winner from the list of entrants
+    if 'entrants' not in st.session_state:
+        st.session_state.entrants = []
     if st.session_state.entrants:
         winner = random.choice(st.session_state.entrants)
         st.success(f"The winner is: @{winner}")
