@@ -1,40 +1,51 @@
-import altair as alt
-import numpy as np
-import pandas as pd
 import streamlit as st
+import random
 
-"""
-# Welcome to Streamlit!
 
-Edit `/streamlit_app.py` to customize this app to your heart's desire :heart:.
-If you have any questions, checkout our [documentation](https://docs.streamlit.io) and [community
-forums](https://discuss.streamlit.io).
+def add_entrant(entrant):
+    if 'entrants' not in st.session_state:
+        st.session_state.entrants = []
+    # Checks if the username is already in the list or if it's empty
+    if entrant:
+        if entrant not in st.session_state.entrants:
+            st.session_state.entrants.append(entrant)
+            st.success(f"You have successfully entered the contest, @{entrant}!")
+        else:
+            st.warning(f"You have already entered the contest, @{entrant}.")
+    else:
+        st.error("Please enter a valid Instagram username to enter the contest.")
 
-In the meantime, below is an example of what you can do with just a few lines of code:
-"""
 
-num_points = st.slider("Number of points in spiral", 1, 10000, 1100)
-num_turns = st.slider("Number of turns in spiral", 1, 300, 31)
+def choose_winner():
+    # Randomly picks a winner from the list of entrants
+    if st.session_state.entrants:
+        winner = random.choice(st.session_state.entrants)
+        st.success(f"The winner is: @{winner}")
+    else:
+        st.error("No entrants yet to select a winner.")
 
-indices = np.linspace(0, 1, num_points)
-theta = 2 * np.pi * num_turns * indices
-radius = indices
 
-x = radius * np.cos(theta)
-y = radius * np.sin(theta)
+st.title("Instagram Contest for a Loud City Ticket")
+st.subheader("Win a free ticket by entering your Instagram username below and following afafore1 on Instagram and "
+             "TikTok!")
 
-df = pd.DataFrame({
-    "x": x,
-    "y": y,
-    "idx": indices,
-    "rand": np.random.randn(num_points),
-})
+# User input for Instagram username
+username_input = st.text_input("Enter your Instagram username", key='username')
 
-st.altair_chart(alt.Chart(df, height=700, width=700)
-    .mark_point(filled=True)
-    .encode(
-        x=alt.X("x", axis=None),
-        y=alt.Y("y", axis=None),
-        color=alt.Color("idx", legend=None, scale=alt.Scale()),
-        size=alt.Size("rand", legend=None, scale=alt.Scale(range=[1, 150])),
-    ))
+# Button to submit the username
+if st.button("Enter Contest"):
+    add_entrant(username_input)
+
+# Optionally, display the list of current entrants
+if st.checkbox('Show current entrants'):
+    st.write("Current entrants:", st.session_state.entrants)
+
+# Admin area for choosing the winner
+with st.expander("Admin Area"):
+    admin_password = st.text_input("Enter Admin Password", type="password")
+    if admin_password == st.secrets['secrets']['admin_password']:
+        if st.button("Choose Winner"):
+            choose_winner()
+    else:
+        if admin_password:
+            st.error("Incorrect password.")
