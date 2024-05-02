@@ -1,30 +1,46 @@
 import streamlit as st
 import random
+import sqlite3
+import time
 
+
+conn = sqlite3.connect('contest.db')
+c = conn.cursor()
+
+c.execute('''
+CREATE TABLE IF NOT EXISTS entrants(
+          username TEXT UNIQUE
+)
+          ''')
+conn.commit()
 
 def add_entrant(entrant):
-    if 'entrants' not in st.session_state:
-        st.session_state.entrants = []
-    # Checks if the username is already in the list or if it's empty
-    if entrant:
-        if entrant not in st.session_state.entrants:
-            st.session_state.entrants.append(entrant)
-            st.success(f"You have successfully entered the contest, @{entrant}!")
-        else:
-            st.warning(f"You have already entered the contest, @{entrant}.")
-    else:
-        st.error("Please enter a valid Instagram username to enter the contest.")
+    try:
+        c.execute('INSERT INTO entrants (username) VALUES (?)', (entrant,))
+        conn.commit()
+        st.success(f"You have successfully entered the contest, @{entrant}!")
+    except sqlite3.IntegrityError:
+        st.warning(f"You have already entered the contest, @{entrant}.")
 
 
 def choose_winner():
-    # Randomly picks a winner from the list of entrants
-    if 'entrants' not in st.session_state:
-        st.session_state.entrants = []
-    if st.session_state.entrants:
-        winner = random.choice(st.session_state.entrants)
-        st.success(f"The winner is: @{winner}")
+    entrants = get_all_entrants()
+    if entrants:
+        placeholder = st.emtpy()
+        sampled_entrants = random.sample(entrants, min(100, len(entrants)))
+        for _ in range(3):
+            for username in sampled_entrants:
+                placeholder.text(f"Now drawing: @{username}")
+                time.sleep(0.05)
+        winner = random.choice(entrants)
+        placeholder.success(f"The winner is: @{winner}")
     else:
-        st.error("No entrants yet to select a winner.")
+        st.error("No entrants yet.")
+
+
+def get_all_entrants():
+    c.execute('SELECT user FROM entrants')
+    return [row[0] for row in c.fetchall()]
 
 
 st.title("Instagram Contest for a Loud City Ticket")
@@ -44,12 +60,9 @@ with st.expander("Admin Area"):
         if st.button("Choose Winner"):
             choose_winner()
         if st.checkbox('Show current entrants'):
-            if 'entrants' not in st.session_state:
-                st.write('no entrants currently')
-            else:
-                st.write("Current entrants:", st.session_state.entrants)
+           st.write(get_all_entrants())
         if st.button("Clear entrants"):
-            st.session_state.entrants = []
+            c.execute('DELETE FROM entrants')
     else:
         if admin_password:
             st.error("Incorrect password.")
