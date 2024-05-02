@@ -26,7 +26,7 @@ def add_entrant(entrant):
 def choose_winner():
     entrants = get_all_entrants()
     if entrants:
-        placeholder = st.emtpy()
+        placeholder = st.empty()
         sampled_entrants = random.sample(entrants, min(100, len(entrants)))
         for _ in range(3):
             for username in sampled_entrants:
