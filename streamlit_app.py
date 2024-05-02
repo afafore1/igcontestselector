@@ -76,14 +76,13 @@ with st.expander("Admin Area"):
             conn.close()
             st.write([entrant[0] for entrant in entrants])
         if st.button("Clear entrants"):
-            if st.button("Confirm Clear All Entrants"):
-                conn = get_db_connection()
-                c = conn.cursor()
-                c.execute('DELETE FROM entrants')
-                conn.commit()
-                conn.close()
-                st.session_state.winner = None
-                st.success("All entrants have been cleared.")
+            conn = get_db_connection()
+            c = conn.cursor()
+            c.execute('DELETE FROM entrants')
+            conn.commit()
+            conn.close()
+            st.session_state.winner = None
+            st.success("All entrants have been cleared.")
     else:
         if admin_password:
             st.error("Incorrect password.")
