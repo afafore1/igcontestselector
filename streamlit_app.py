@@ -4,23 +4,34 @@ import sqlite3
 import time
 
 
-conn = sqlite3.connect('contest.db')
-c = conn.cursor()
+def get_db_connection():
+    conn = sqlite3.connect('contest.db', check_same_thread=False)
+    return conn
+
+# Function to create table if it does not exist
+def setup_database():
+    conn = get_db_connection()
+    c = conn.cursor()
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS entrants(
+        username TEXT UNIQUE
+        )
+    ''')
+    conn.commit()
+    conn.close()
+
+setup_database()  # Set up the database table if not already set up
 if 'winner' not in st.session_state:
     st.session_state.winner = None
-
-c.execute('''
-CREATE TABLE IF NOT EXISTS entrants(
-          username TEXT UNIQUE
-)
-          ''')
-conn.commit()
 
 
 def add_entrant(entrant):
     try:
+        conn = get_db_connection()
+        c = conn.cursor()
         c.execute('INSERT INTO entrants (username) VALUES (?)', (entrant,))
         conn.commit()
+        conn.close()
         st.success(f"You have successfully entered the contest, @{entrant}!")
     except sqlite3.IntegrityError:
         st.warning(f"You have already entered the contest, @{entrant}.")
@@ -43,7 +54,10 @@ def choose_winner():
 
 
 def get_all_entrants():
+    conn = get_db_connection()
+    c = conn.cursor()
     c.execute('SELECT username FROM entrants')
+    conn.close()
     return [row[0] for row in c.fetchall()]
 
 
@@ -68,8 +82,11 @@ with st.expander("Admin Area"):
         if st.checkbox('Show current entrants'):
            st.write(get_all_entrants())
         if st.button("Clear entrants"):
+            conn = get_db_connection()
+            c = conn.cursor()
             c.execute('DELETE FROM entrants')
             conn.commit()
+            conn.close()
             st.session_state.winner = None
     else:
         if admin_password:
