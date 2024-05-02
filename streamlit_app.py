@@ -39,7 +39,7 @@ def choose_winner():
 
 
 def get_all_entrants():
-    c.execute('SELECT user FROM entrants')
+    c.execute('SELECT username FROM entrants')
     return [row[0] for row in c.fetchall()]
 
 
