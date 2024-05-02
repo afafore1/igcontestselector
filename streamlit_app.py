@@ -44,7 +44,10 @@ with st.expander("Admin Area"):
         if st.button("Choose Winner"):
             choose_winner()
         if st.checkbox('Show current entrants'):
-            st.write("Current entrants:", st.session_state.entrants)
+            if 'entrants' not in st.session_state:
+                st.write('no entrants currently')
+            else:
+                st.write("Current entrants:", st.session_state.entrants)
         if st.button("Clear entrants"):
             st.session_state.entrants = []
     else:
