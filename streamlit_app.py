@@ -48,6 +48,8 @@ with st.expander("Admin Area"):
     if admin_password == st.secrets['secrets']['admin_password']:
         if st.button("Choose Winner"):
             choose_winner()
+        if st.button("Clear entrants"):
+            st.session_state.entrants = []
     else:
         if admin_password:
             st.error("Incorrect password.")
