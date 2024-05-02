@@ -66,7 +66,7 @@ if st.session_state.winner is None:
 # Admin area for choosing the winner
 with st.expander("Admin Area"):
     admin_password = st.text_input("Enter Admin Password", type="password")
-    if admin_password == "your_admin_password":  # This should ideally be stored securely or in Streamlit secrets
+    if admin_password == st.secrets['secrets']['admin_password']:
         if st.button("Choose Winner"):
             choose_winner()
         if st.checkbox('Show current entrants'):
