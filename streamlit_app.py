@@ -49,7 +49,7 @@ def get_all_entrants():
 
 st.title("Instagram Contest for a Loud City Ticket")
 if st.session_state.winner is None:
-    st.subheader("Win a free ticket by entering your Instagram username below and following afafore1 on Instagram!")
+    st.subheader("Win a free ticket by following afafore1 on Instagram and entering your Instagram username below!")
 
     # User input for Instagram username
     username_input = st.text_input("Enter your Instagram username", key='username')
@@ -74,4 +74,3 @@ with st.expander("Admin Area"):
     else:
         if admin_password:
             st.error("Incorrect password.")
-            
