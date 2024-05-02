@@ -28,8 +28,7 @@ def choose_winner():
 
 
 st.title("Instagram Contest for a Loud City Ticket")
-st.subheader("Win a free ticket by entering your Instagram username below and following afafore1 on Instagram and "
-             "TikTok!")
+st.subheader("Win a free ticket by entering your Instagram username below and following afafore1 on Instagram!")
 
 # User input for Instagram username
 username_input = st.text_input("Enter your Instagram username", key='username')
