@@ -68,6 +68,7 @@ with st.expander("Admin Area"):
            st.write(get_all_entrants())
         if st.button("Clear entrants"):
             c.execute('DELETE FROM entrants')
+            st.session_state.winner = None
     else:
         if admin_password:
             st.error("Incorrect password.")
