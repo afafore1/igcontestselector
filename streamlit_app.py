@@ -57,7 +57,6 @@ def get_all_entrants():
     conn = get_db_connection()
     c = conn.cursor()
     c.execute('SELECT username FROM entrants')
-    conn.close()
     return [row[0] for row in c.fetchall()]
 
 
