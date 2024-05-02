@@ -36,6 +36,7 @@ def choose_winner():
                 time.sleep(0.05)
         winner = random.choice(entrants)
         placeholder.success(f"The winner is: @{winner}")
+        st.session_state.winner = winner
     else:
         st.error("No entrants yet.")
 
