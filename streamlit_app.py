@@ -54,6 +54,7 @@ def choose_winner():
         st.error("No entrants yet.")
 
 st.title("Instagram Contest for a Loud City Ticket")
+st.write(st.session_state.winner)
 if st.session_state.winner is None:
     st.subheader("Win a free ticket by entering your Instagram username below and following afafore1 on Instagram!")
 
