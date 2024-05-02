@@ -52,12 +52,11 @@ if st.session_state.winner is None:
 
     # User input for Instagram username
     username_input = st.text_input("Enter your Instagram username", key='username')
+    # Button to submit the username
+    if st.button("Enter Contest"):
+        add_entrant(username_input)
 else:
     st.subheader(f"The winner is: @{st.session_state.winner}")
-
-# Button to submit the username
-if st.button("Enter Contest"):
-    add_entrant(username_input)
 
 # Admin area for choosing the winner
 with st.expander("Admin Area"):
