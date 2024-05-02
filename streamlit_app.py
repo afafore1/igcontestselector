@@ -6,6 +6,8 @@ import time
 
 conn = sqlite3.connect('contest.db')
 c = conn.cursor()
+if 'winner' not in st.session_state:
+    st.session_state.winner = None
 
 c.execute('''
 CREATE TABLE IF NOT EXISTS entrants(
@@ -44,10 +46,13 @@ def get_all_entrants():
 
 
 st.title("Instagram Contest for a Loud City Ticket")
-st.subheader("Win a free ticket by entering your Instagram username below and following afafore1 on Instagram!")
+if st.session_state.winner is None:
+    st.subheader("Win a free ticket by entering your Instagram username below and following afafore1 on Instagram!")
 
-# User input for Instagram username
-username_input = st.text_input("Enter your Instagram username", key='username')
+    # User input for Instagram username
+    username_input = st.text_input("Enter your Instagram username", key='username')
+else:
+    st.subheader(f"The winner is: @{st.session_state.winner}")
 
 # Button to submit the username
 if st.button("Enter Contest"):
