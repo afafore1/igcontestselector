@@ -37,16 +37,14 @@ username_input = st.text_input("Enter your Instagram username", key='username')
 if st.button("Enter Contest"):
     add_entrant(username_input)
 
-# Optionally, display the list of current entrants
-if st.checkbox('Show current entrants'):
-    st.write("Current entrants:", st.session_state.entrants)
-
 # Admin area for choosing the winner
 with st.expander("Admin Area"):
     admin_password = st.text_input("Enter Admin Password", type="password")
     if admin_password == st.secrets['secrets']['admin_password']:
         if st.button("Choose Winner"):
             choose_winner()
+        if st.checkbox('Show current entrants'):
+            st.write("Current entrants:", st.session_state.entrants)
         if st.button("Clear entrants"):
             st.session_state.entrants = []
     else:
