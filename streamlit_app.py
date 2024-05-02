@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS entrants(
           ''')
 conn.commit()
 
+
 def add_entrant(entrant):
     try:
         c.execute('INSERT INTO entrants (username) VALUES (?)', (entrant,))
