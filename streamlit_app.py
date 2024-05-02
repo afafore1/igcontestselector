@@ -1,34 +1,45 @@
 import streamlit as st
-import random
 import sqlite3
+import random
 import time
-from contextlib import contextmanager
 
-# Database management
-@contextmanager
+# Function to get database connection
 def get_db_connection():
-    conn = sqlite3.connect('contest.db')
-    try:
-        yield conn.cursor()
-    finally:
-        conn.commit()
-        conn.close()
+    conn = sqlite3.connect('contest.db', check_same_thread=False)
+    return conn
+
+# Function to create table if it does not exist
+def setup_database():
+    conn = get_db_connection()
+    c = conn.cursor()
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS entrants(
+        username TEXT UNIQUE
+        )
+    ''')
+    conn.commit()
+    conn.close()
+
+setup_database()  # Set up the database table if not already set up
 
 def add_entrant(entrant):
-    with get_db_connection() as c:
-        try:
-            c.execute('INSERT INTO entrants (username) VALUES (?)', (entrant,))
-            st.success(f"You have successfully entered the contest, @{entrant}!")
-        except sqlite3.IntegrityError:
-            st.warning(f"You have already entered the contest, @{entrant}.")
-
-def get_all_entrants():
-    with get_db_connection() as c:
-        c.execute('SELECT username FROM entrants')
-        return [row[0] for row in c.fetchall()]
+    conn = get_db_connection()
+    c = conn.cursor()
+    try:
+        c.execute('INSERT INTO entrants (username) VALUES (?)', (entrant,))
+        conn.commit()
+        st.success(f"You have successfully entered the contest, @{entrant}!")
+    except sqlite3.IntegrityError:
+        st.warning(f"You have already entered the contest, @{entrant}.")
+    finally:
+        conn.close()
 
 def choose_winner():
-    entrants = get_all_entrants()
+    conn = get_db_connection()
+    c = conn.cursor()
+    entrants = c.execute('SELECT username FROM entrants').fetchall()
+    entrants = [entrant[0] for entrant in entrants]
+    conn.close()
     if entrants:
         placeholder = st.empty()
         sampled_entrants = random.sample(entrants, min(100, len(entrants)))
@@ -42,29 +53,35 @@ def choose_winner():
     else:
         st.error("No entrants yet.")
 
-# Streamlit app layout
 st.title("Instagram Contest for a Loud City Ticket")
-if 'winner' not in st.session_state:
-    st.session_state.winner = None
-
 if st.session_state.winner is None:
     st.subheader("Win a free ticket by entering your Instagram username below and following afafore1 on Instagram!")
+
+    # User input for Instagram username
     username_input = st.text_input("Enter your Instagram username", key='username')
     if st.button("Enter Contest"):
-        add_entrant(username_input)
+        if username_input:
+            add_entrant(username_input)
 
-# Admin area for choosing the winner and managing entrants
+# Admin area for choosing the winner
 with st.expander("Admin Area"):
     admin_password = st.text_input("Enter Admin Password", type="password")
-    if admin_password == st.secrets['secrets']['admin_password']:
+    if admin_password == "your_admin_password":  # This should ideally be stored securely or in Streamlit secrets
         if st.button("Choose Winner"):
             choose_winner()
         if st.checkbox('Show current entrants'):
-            st.write(get_all_entrants())
+            conn = get_db_connection()
+            c = conn.cursor()
+            entrants = c.execute('SELECT username FROM entrants').fetchall()
+            conn.close()
+            st.write([entrant[0] for entrant in entrants])
         if st.button("Clear entrants"):
             if st.button("Confirm Clear All Entrants"):
-                with get_db_connection() as c:
-                    c.execute('DELETE FROM entrants')
+                conn = get_db_connection()
+                c = conn.cursor()
+                c.execute('DELETE FROM entrants')
+                conn.commit()
+                conn.close()
                 st.session_state.winner = None
                 st.success("All entrants have been cleared.")
     else:
