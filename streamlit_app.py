@@ -78,17 +78,21 @@ else:
 with st.expander("Admin Area"):
     admin_password = st.text_input("Enter Admin Password", type="password")
     if admin_password == st.secrets['secrets']['admin_password']:
+        all_entrants = get_all_entrants()
         if st.button("Choose Winner"):
             choose_winner()
         if st.checkbox('Show current entrants'):
-           st.dataframe(get_all_entrants())
+           st.dataframe(all_entrants)
         if st.button("Clear entrants"):
             conn = get_db_connection()
             c = conn.cursor()
             c.execute('DELETE FROM entrants')
             conn.commit()
             conn.close()
-            st.session_state.winner = None
+            st.session_state.winners = None
+        if len(all_entrants) > 0:
+            if len(all_entrants) >= 5000:
+                st.write('choose winners now')
     else:
         if admin_password:
             st.error("Incorrect password.")
