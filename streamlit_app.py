@@ -21,8 +21,8 @@ def setup_database():
     conn.close()
 
 setup_database()  # Set up the database table if not already set up
-if 'winner' not in st.session_state:
-    st.session_state.winner = None
+if 'winners' not in st.session_state:
+    st.session_state.winners = None
 
 
 def add_entrant(entrant):
@@ -46,22 +46,22 @@ def choose_winner():
             for username in sampled_entrants:
                 placeholder.text(f"Now drawing: @{username}")
                 time.sleep(0.05)
-        winner = random.choice(entrants)
-        placeholder.success(f"The winner is: @{winner}")
-        st.session_state.winner = winner
+        winners = random.sample(entrants, 2)
+        placeholder.success(f"The winners are: @{winners[0]} and @{winners[1]}")
+        st.session_state.winners = winners
     else:
         st.error("No entrants yet.")
 
 
 def get_all_entrants():
-    conn = get_db_connection()
-    c = conn.cursor()
-    c.execute('SELECT username FROM entrants')
-    return [row[0] for row in c.fetchall()]
+    with sqlite3.connect('contest.db') as conn:
+        c = conn.cursor()
+        c.execute('SELECT username FROM entrants')
+        return [row[0] for row in c.fetchall()]
 
 
 st.title("Instagram Contest for a Loud City Ticket")
-if st.session_state.winner is None:
+if st.session_state.winners is None:
     st.subheader("Win a free ticket by following afafore1 on Instagram and entering your Instagram username below!")
 
     # User input for Instagram username
@@ -70,7 +70,8 @@ if st.session_state.winner is None:
     if st.button("Enter Contest"):
         add_entrant(username_input)
 else:
-    st.subheader(f"The winner is: @{st.session_state.winner}")
+    winners = st.session_state.winners
+    st.subheader(f"The winners are: @{winners[0]} and @{winners[1]}")
 
 
 # Admin area for choosing the winner
@@ -80,7 +81,7 @@ with st.expander("Admin Area"):
         if st.button("Choose Winner"):
             choose_winner()
         if st.checkbox('Show current entrants'):
-           st.write(get_all_entrants())
+           st.dataframe(get_all_entrants())
         if st.button("Clear entrants"):
             conn = get_db_connection()
             c = conn.cursor()
