@@ -44,7 +44,7 @@ def add_entrant(entrant):
         if 'duplicate key value violates unique constraint' in str(e):
             st.error('You are already entered into the contest')
         else:
-            st.error('An error occurred, please DM me to fix!')
+            st.error('An error occurred, please DM me to fix!', str(e))
 
 
 def choose_winner():
