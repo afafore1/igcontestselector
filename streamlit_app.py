@@ -31,6 +31,7 @@ def refresh_team_and_opponent():
         latest_entry = pd.DataFrame(response.data).iloc[0]
         st.session_state.current_team = latest_entry['team']
         st.session_state.current_opponent = latest_entry['opponent']
+        st.session_state.date_playing = latest_entry['date_playing']
 
 
 def add_entrant(entrant):
@@ -38,13 +39,13 @@ def add_entrant(entrant):
     current_team, current_opponent = st.session_state.current_team, st.session_state.current_opponent
     try:
         supabase.table(table_name).insert(
-            {'entrant': entrant, 'team_ticket': current_team, 'opponent': current_opponent, 'date_playing': st.session_state.date_playing}).execute()
+            {'entrant': entrant, 'team_ticket': current_team, 'opponent': current_opponent, 'date_playing': st.session_state.date_playing.isoformat()}).execute()
         st.success(f"You have successfully entered the contest, @{entrant}!")
     except Exception as e:
         if 'duplicate key value violates unique constraint' in str(e):
             st.error('You are already entered into the contest')
         else:
-            st.error('An error occurred, please DM me to fix!', str(e))
+            st.error('An error occurred, please DM me to fix!')
 
 
 def choose_winner():
@@ -98,7 +99,6 @@ with st.expander("Admin Area"):
         if st.button('Start new contest'):
             if opponent:
                 supabase.table('team_to_opponent').insert({'team': team, 'opponent': opponent, 'date_playing': date_playing.isoformat()}).execute()
-                st.session_state.date_playing = date_playing.isoformat()
                 st.session_state.winners = None
                 st.success('Inserted team details')
     else:
