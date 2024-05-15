@@ -38,6 +38,7 @@ def add_entrant(entrant):
     refresh_team_and_opponent()
     current_team, current_opponent = st.session_state.current_team, st.session_state.current_opponent
     try:
+        st.write(st.session_state)
         supabase.table(table_name).insert(
             {'entrant': entrant, 'team_ticket': current_team, 'opponent': current_opponent, 'date_playing': st.session_state.date_playing.isoformat()}).execute()
         st.success(f"You have successfully entered the contest, @{entrant}!")
