@@ -38,15 +38,14 @@ def add_entrant(entrant):
     refresh_team_and_opponent()
     current_team, current_opponent = st.session_state.current_team, st.session_state.current_opponent
     try:
-        st.write(st.session_state)
         supabase.table(table_name).insert(
-            {'entrant': entrant, 'team_ticket': current_team, 'opponent': current_opponent, 'date_playing': st.session_state.date_playing.isoformat()}).execute()
+            {'entrant': entrant, 'team_ticket': current_team, 'opponent': current_opponent, 'date_playing': st.session_state.date_playing}).execute()
         st.success(f"You have successfully entered the contest, @{entrant}!")
     except Exception as e:
         if 'duplicate key value violates unique constraint' in str(e):
             st.error('You are already entered into the contest')
         else:
-            st.error('An error occurred, please DM me to fix!')
+            st.error(str(e))
 
 
 def choose_winner():
