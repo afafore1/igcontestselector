@@ -60,7 +60,7 @@ if contest_started():
         add_entrant(username_input)
 else:
     if st.session_state.winners is None:
-        st.subheader('Contest will start before the next game!')
+        st.subheader('Contest will start for Game 7 if we win on Saturday. Thunder up!')
     else:
         winners = st.session_state.winners
         st.subheader(f"The winners are: @{winners[0]['entrant']} and @{winners[1]['entrant']}")
